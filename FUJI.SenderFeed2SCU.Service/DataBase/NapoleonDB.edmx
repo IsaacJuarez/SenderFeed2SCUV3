@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="NAPOLEONModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="tbl_ConfigSitio">
+          <Key>
+            <PropertyRef Name="id_Sitio" />
+          </Key>
+          <Property Name="id_Sitio" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="vchClaveSitio" Type="varchar" MaxLength="200" />
+          <Property Name="vchnombreSitio" Type="varchar" MaxLength="200" />
+          <Property Name="vchIPCliente" Type="varchar" MaxLength="200" />
+          <Property Name="vchMaskCliente" Type="varchar" MaxLength="200" />
+          <Property Name="intPuertoCliente" Type="int" />
+          <Property Name="vchAETitle" Type="varchar" MaxLength="200" />
+          <Property Name="vchPathLocal" Type="varchar" MaxLength="200" />
+          <Property Name="vchIPServidor" Type="varchar" MaxLength="200" />
+          <Property Name="in_tPuertoServer" Type="int" />
+          <Property Name="vchAETitleServer" Type="varchar" MaxLength="200" />
+          <Property Name="datFechaSistema" Type="datetime" />
+          <Property Name="vchUserAdmin" Type="varchar" MaxLength="200" />
+          <Property Name="bitActivo" Type="bit" />
+        </EntityType>
+        <EntityType Name="tbl_DET_Estudio">
+          <Key>
+            <PropertyRef Name="intDetEstudioID" />
+          </Key>
+          <Property Name="intDetEstudioID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="intEstudioID" Type="int" />
+          <Property Name="intEstatusID" Type="int" />
+          <Property Name="vchNameFile" Type="varchar" MaxLength="200" />
+          <Property Name="intSizeFile" Type="int" />
+          <Property Name="vchPathFile" Type="varchar" MaxLength="200" />
+          <Property Name="datFecha" Type="datetime" />
+          <Property Name="vchStudyInstanceUID" Type="varchar" MaxLength="200" />
+        </EntityType>
+        <EntityType Name="tbl_DET_ServicioSitio">
+          <Key>
+            <PropertyRef Name="intDetServicioID" />
+          </Key>
+          <Property Name="intDetServicioID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="id_Sitio" Type="int" />
+          <Property Name="datFechaSCP" Type="datetime" />
+          <Property Name="datFechaSCU" Type="datetime" />
+          <Property Name="datFechaSync" Type="datetime" />
+        </EntityType>
+        <Association Name="FK_ConfigSitio_DET_ServicioSitio">
+          <End Role="tbl_ConfigSitio" Type="Self.tbl_ConfigSitio" Multiplicity="0..1" />
+          <End Role="tbl_DET_ServicioSitio" Type="Self.tbl_DET_ServicioSitio" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_ConfigSitio">
+              <PropertyRef Name="id_Sitio" />
+            </Principal>
+            <Dependent Role="tbl_DET_ServicioSitio">
+              <PropertyRef Name="id_Sitio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="stp_getEstudiosEnviar" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="id_Sitio" Type="int" Mode="In" />
+        </Function>
+        <EntityContainer Name="NAPOLEONModelStoreContainer">
+          <EntitySet Name="tbl_ConfigSitio" EntityType="Self.tbl_ConfigSitio" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_DET_Estudio" EntityType="Self.tbl_DET_Estudio" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tbl_DET_ServicioSitio" EntityType="Self.tbl_DET_ServicioSitio" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ConfigSitio_DET_ServicioSitio" Association="Self.FK_ConfigSitio_DET_ServicioSitio">
+            <End Role="tbl_ConfigSitio" EntitySet="tbl_ConfigSitio" />
+            <End Role="tbl_DET_ServicioSitio" EntitySet="tbl_DET_ServicioSitio" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="NAPOLEONModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="NAPOLEONEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="tbl_DET_ServicioSitio" EntityType="NAPOLEONModel.tbl_DET_ServicioSitio" />
+          <EntitySet Name="tbl_ConfigSitio" EntityType="NAPOLEONModel.tbl_ConfigSitio" />
+          <AssociationSet Name="FK_ConfigSitio_DET_ServicioSitio" Association="NAPOLEONModel.FK_ConfigSitio_DET_ServicioSitio">
+            <End Role="tbl_ConfigSitio" EntitySet="tbl_ConfigSitio" />
+            <End Role="tbl_DET_ServicioSitio" EntitySet="tbl_DET_ServicioSitio" />
+          </AssociationSet>
+          <EntitySet Name="tbl_DET_Estudio" EntityType="NAPOLEONModel.tbl_DET_Estudio" />
+          <FunctionImport Name="stp_getEstudiosEnviar" ReturnType="Collection(NAPOLEONModel.stp_getEstudiosEnviar_Result)">
+            <Parameter Name="id_Sitio" Mode="In" Type="Int32" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="tbl_DET_ServicioSitio">
+          <Key>
+            <PropertyRef Name="intDetServicioID" />
+          </Key>
+          <Property Name="intDetServicioID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="id_Sitio" Type="Int32" />
+          <Property Name="datFechaSCP" Type="DateTime" Precision="3" />
+          <Property Name="datFechaSCU" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="tbl_ConfigSitio" Relationship="NAPOLEONModel.FK_ConfigSitio_DET_ServicioSitio" FromRole="tbl_DET_ServicioSitio" ToRole="tbl_ConfigSitio" />
+          <Property Name="datFechaSync" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="tbl_ConfigSitio">
+          <Key>
+            <PropertyRef Name="id_Sitio" />
+          </Key>
+          <Property Name="id_Sitio" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="vchClaveSitio" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="vchnombreSitio" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="vchIPCliente" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="vchMaskCliente" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="intPuertoCliente" Type="Int32" />
+          <Property Name="vchAETitle" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="vchPathLocal" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="vchIPServidor" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="in_tPuertoServer" Type="Int32" />
+          <Property Name="vchAETitleServer" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="datFechaSistema" Type="DateTime" Precision="3" />
+          <Property Name="vchUserAdmin" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="bitActivo" Type="Boolean" />
+          <NavigationProperty Name="tbl_DET_ServicioSitio" Relationship="NAPOLEONModel.FK_ConfigSitio_DET_ServicioSitio" FromRole="tbl_ConfigSitio" ToRole="tbl_DET_ServicioSitio" />
+        </EntityType>
+        <Association Name="FK_ConfigSitio_DET_ServicioSitio">
+          <End Type="NAPOLEONModel.tbl_ConfigSitio" Role="tbl_ConfigSitio" Multiplicity="0..1" />
+          <End Type="NAPOLEONModel.tbl_DET_ServicioSitio" Role="tbl_DET_ServicioSitio" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tbl_ConfigSitio">
+              <PropertyRef Name="id_Sitio" />
+            </Principal>
+            <Dependent Role="tbl_DET_ServicioSitio">
+              <PropertyRef Name="id_Sitio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="tbl_DET_Estudio">
+          <Key>
+            <PropertyRef Name="intDetEstudioID" />
+          </Key>
+          <Property Name="intDetEstudioID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="intEstudioID" Type="Int32" />
+          <Property Name="intEstatusID" Type="Int32" />
+          <Property Name="vchNameFile" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="intSizeFile" Type="Int32" />
+          <Property Name="vchPathFile" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="datFecha" Type="DateTime" Precision="3" />
+          <Property Name="vchStudyInstanceUID" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <ComplexType Name="stp_getEstudiosEnviar_Result">
+          <Property Type="Int32" Name="intDetEstudioID" Nullable="false" />
+          <Property Type="Int32" Name="intEstudioID" Nullable="true" />
+          <Property Type="Int32" Name="intModalidadID" Nullable="true" />
+          <Property Type="String" Name="vchPathFile" Nullable="true" MaxLength="200" />
+          <Property Type="Int32" Name="intEstatusID" Nullable="true" />
+          <Property Type="Boolean" Name="bitUrgente" Nullable="false" />
+          <Property Type="Int32" Name="intSecuencia" Nullable="false" />
+          <Property Type="DateTime" Name="datFecha" Nullable="true" Precision="23" />
+          <Property Type="Int32" Name="URGENTES" Nullable="false" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="NAPOLEONModelStoreContainer" CdmEntityContainer="NAPOLEONEntities" >
+          <EntitySetMapping Name="tbl_DET_ServicioSitio">
+            <EntityTypeMapping TypeName="NAPOLEONModel.tbl_DET_ServicioSitio">
+              <MappingFragment StoreEntitySet="tbl_DET_ServicioSitio">
+                <ScalarProperty Name="datFechaSync" ColumnName="datFechaSync" />
+                <ScalarProperty Name="datFechaSCU" ColumnName="datFechaSCU" />
+                <ScalarProperty Name="datFechaSCP" ColumnName="datFechaSCP" />
+                <ScalarProperty Name="id_Sitio" ColumnName="id_Sitio" />
+                <ScalarProperty Name="intDetServicioID" ColumnName="intDetServicioID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_ConfigSitio">
+            <EntityTypeMapping TypeName="NAPOLEONModel.tbl_ConfigSitio">
+              <MappingFragment StoreEntitySet="tbl_ConfigSitio">
+                <ScalarProperty Name="bitActivo" ColumnName="bitActivo" />
+                <ScalarProperty Name="vchUserAdmin" ColumnName="vchUserAdmin" />
+                <ScalarProperty Name="datFechaSistema" ColumnName="datFechaSistema" />
+                <ScalarProperty Name="vchAETitleServer" ColumnName="vchAETitleServer" />
+                <ScalarProperty Name="in_tPuertoServer" ColumnName="in_tPuertoServer" />
+                <ScalarProperty Name="vchIPServidor" ColumnName="vchIPServidor" />
+                <ScalarProperty Name="vchPathLocal" ColumnName="vchPathLocal" />
+                <ScalarProperty Name="vchAETitle" ColumnName="vchAETitle" />
+                <ScalarProperty Name="intPuertoCliente" ColumnName="intPuertoCliente" />
+                <ScalarProperty Name="vchMaskCliente" ColumnName="vchMaskCliente" />
+                <ScalarProperty Name="vchIPCliente" ColumnName="vchIPCliente" />
+                <ScalarProperty Name="vchnombreSitio" ColumnName="vchnombreSitio" />
+                <ScalarProperty Name="vchClaveSitio" ColumnName="vchClaveSitio" />
+                <ScalarProperty Name="id_Sitio" ColumnName="id_Sitio" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tbl_DET_Estudio">
+            <EntityTypeMapping TypeName="NAPOLEONModel.tbl_DET_Estudio">
+              <MappingFragment StoreEntitySet="tbl_DET_Estudio">
+                <ScalarProperty Name="vchStudyInstanceUID" ColumnName="vchStudyInstanceUID" />
+                <ScalarProperty Name="datFecha" ColumnName="datFecha" />
+                <ScalarProperty Name="vchPathFile" ColumnName="vchPathFile" />
+                <ScalarProperty Name="intSizeFile" ColumnName="intSizeFile" />
+                <ScalarProperty Name="vchNameFile" ColumnName="vchNameFile" />
+                <ScalarProperty Name="intEstatusID" ColumnName="intEstatusID" />
+                <ScalarProperty Name="intEstudioID" ColumnName="intEstudioID" />
+                <ScalarProperty Name="intDetEstudioID" ColumnName="intDetEstudioID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="stp_getEstudiosEnviar" FunctionName="NAPOLEONModel.Store.stp_getEstudiosEnviar">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NAPOLEONModel.stp_getEstudiosEnviar_Result">
+                <ScalarProperty Name="intDetEstudioID" ColumnName="intDetEstudioID" />
+                <ScalarProperty Name="intEstudioID" ColumnName="intEstudioID" />
+                <ScalarProperty Name="intModalidadID" ColumnName="intModalidadID" />
+                <ScalarProperty Name="vchPathFile" ColumnName="vchPathFile" />
+                <ScalarProperty Name="intEstatusID" ColumnName="intEstatusID" />
+                <ScalarProperty Name="bitUrgente" ColumnName="bitUrgente" />
+                <ScalarProperty Name="intSecuencia" ColumnName="intSecuencia" />
+                <ScalarProperty Name="datFecha" ColumnName="datFecha" />
+                <ScalarProperty Name="URGENTES" ColumnName="URGENTES" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Ninguno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
