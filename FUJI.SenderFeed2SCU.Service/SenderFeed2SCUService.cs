@@ -2,16 +2,12 @@
 using FUJI.SenderFeed2SCU.Service.DataBase;
 using FUJI.SenderFeed2SCU.Service.Entidades;
 using FUJI.SenderFeed2SCU.Service.Extensions;
+using FUJI.SenderFeed2SCU.Service.Feed2Service;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -21,10 +17,10 @@ namespace FUJI.SenderFeed2SCU.Service
     partial class SenderFeed2SCUService : ServiceBase
     {
         private System.Timers.Timer SenderTimer = new System.Timers.Timer();
-        public static clsConfiguracion _conf;
+        public static Entidades.clsConfiguracion _conf;
         public static int id_Servicio = 0;
         public static string vchClaveSitio = "";
-        public static NAPOLEONEntities NapoleonDA = new NAPOLEONEntities();
+        //public static NAPOLEONEntities NapoleonDA = new NAPOLEONEntities();
         public static string AETitle = "";
         public static string vchPathRep = "";
         public static string path = "";
@@ -63,8 +59,17 @@ namespace FUJI.SenderFeed2SCU.Service
                 }
                 Console.WriteLine("Se cargó correctamente el servicio SenderFeed2SCUService. " + "[" + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString() + "]");
                 Log.EscribeLog("Se cargó correctamente el servicio SenderFeed2SCUService. ");
-                int minutosPoleo = ConfigurationManager.AppSettings["minutosPoleo"] != null ? Convert.ToInt32(ConfigurationManager.AppSettings["minutosPoleo"].ToString()) : 1;
-                int minutos = 1000 * 60 * minutosPoleo;
+                int segundosPoleo;
+                try
+                {
+                    segundosPoleo = ConfigurationManager.AppSettings["segundosPoleo"] != null ? Convert.ToInt32(ConfigurationManager.AppSettings["segundosPoleo"].ToString()) : 1;
+                }
+                catch (Exception eGPOLeo)
+                {
+                    Log.EscribeLog("Existe un error al obtener el tiempo para el poleo del servicio: " + eGPOLeo.Message);
+                    segundosPoleo = 1;
+                }
+                int minutos = (int)(1000 * segundosPoleo);
                 SenderTimer.Elapsed += new System.Timers.ElapsedEventHandler(SenderTimer_Elapsed);
                 SenderTimer.Interval = minutos;
                 SenderTimer.Enabled = true;
@@ -100,26 +105,29 @@ namespace FUJI.SenderFeed2SCU.Service
                 Console.WriteLine("[" + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString() + "] Leyendo estudios para Enviar.");
 
                 NapoleonSenderDataAccess NapServer = new NapoleonSenderDataAccess();
-                List<clsEstudio> _lstEst = new List<clsEstudio>();
-                _lstEst = NapServer.getEstudiosEnviar(id_Servicio);
-                if(_lstEst!= null)
+                Feed2Service.ClienteF2CResponse response = new Feed2Service.ClienteF2CResponse();
+                response = NapServer.getEstudiosEnviar(id_Servicio, vchClaveSitio);
+                if (response != null)
                 {
-                    if(_lstEst.Count > 0 )
+                    if (response.lstEstudio != null)
                     {
-                        foreach(clsEstudio estudio in _lstEst)
+                        if (response.lstEstudio.Count() > 0)
                         {
-                            //enviar uno por uni
-                            //verificar Folder
-                            if(File.Exists(estudio.vchPathFile))
+                            foreach (Feed2Service.clsEstudio estudio in response.lstEstudio)
                             {
-                                Thread.Sleep(3000);
-                                sendFile(estudio.vchPathFile, estudio.intDetEstudioID);
+                                //enviar uno por uni
+                                //verificar Folder
+                                if (File.Exists(estudio.vchPathFile))
+                                {
+                                    Thread.Sleep(3000);
+                                    sendFile(estudio.vchPathFile, estudio.intDetEstudioID);
+                                }
+                                else
+                                {
+                                    Log.EscribeLog("No existe el archivo " + estudio.vchPathFile + "  para ser enviado");
+                                }
+                                //si existe enviar
                             }
-                            else
-                            {
-                                Log.EscribeLog("No existe el archivo " + estudio.vchPathFile + "  para ser enviado");
-                            }
-                            //si existe enviar
                         }
                     }
                 }
@@ -187,7 +195,7 @@ namespace FUJI.SenderFeed2SCU.Service
                     if (respuesta == "1")
                     {
                         NapoleonSenderDataAccess NapServer = new NapoleonSenderDataAccess();
-                        NapServer.updateEstatus(intDetEstudioID);
+                        NapServer.updateEstatus(intDetEstudioID, id_Servicio, vchClaveSitio);
                         //moverFile(fullpath, respuesta);
                     }
                     
