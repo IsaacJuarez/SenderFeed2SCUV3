@@ -1,4 +1,10 @@
-﻿using Dicom.Network;
+﻿using NLog.Config;
+using NLog.Targets;
+
+using Dicom;
+using Dicom.Imaging;
+using Dicom.Log;
+using Dicom.Network;
 using FUJI.SenderFeed2SCU.Service.DataBase;
 using FUJI.SenderFeed2SCU.Service.Entidades;
 using FUJI.SenderFeed2SCU.Service.Extensions;
@@ -24,6 +30,7 @@ namespace FUJI.SenderFeed2SCU.Service
         public static string AETitle = "";
         public static string vchPathRep = "";
         public static string path = "";
+        public static string Logpath = "";
 
         public SenderFeed2SCUService()
         {
@@ -48,6 +55,15 @@ namespace FUJI.SenderFeed2SCU.Service
                 {
                     path = "";
                     Log.EscribeLog("Error al obtener el path desde appSettings: " + ePath.Message);
+                }
+                try
+                {
+                    Logpath = ConfigurationManager.AppSettings["LogDirectory"] != null ? ConfigurationManager.AppSettings["LogDirectory"].ToString() : "";
+                }
+                catch (Exception ePath)
+                {
+                    Logpath = "";
+                    Log.EscribeLog("Error al obtener el path desde Log: " + ePath.Message);
                 }
                 if (File.Exists(path + "info.xml"))
                 {
@@ -101,7 +117,7 @@ namespace FUJI.SenderFeed2SCU.Service
                 {
                     Log.EscribeLog("Existe un error en setService: " + setSer.Message);
                 }
-                Log.EscribeLog("[" + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString() + "] Leyendo estudios para Enviar.");
+                //Log.EscribeLog("[" + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString() + "] Leyendo estudios para Enviar.");
                 Console.WriteLine("[" + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString() + "] Leyendo estudios para Enviar.");
 
                 NapoleonSenderDataAccess NapServer = new NapoleonSenderDataAccess();
@@ -155,15 +171,54 @@ namespace FUJI.SenderFeed2SCU.Service
 
                         if (_ser != "" && port > 0 && _aetA != "" && _aetS != "")
                         {
+                            #region Bitacora
+                            LogManager.SetImplementation(NLogManager.Instance);
+                            DicomException.OnException += delegate (object sender, DicomExceptionEventArgs ea)
+                            {
+                                ConsoleColor old = Console.ForegroundColor;
+                                Console.ForegroundColor = ConsoleColor.Yellow;
+                                Console.WriteLine(ea.Exception);
+                                Console.ForegroundColor = old;
+                            };
+                            var config = new LoggingConfiguration();
+                            var target = new ColoredConsoleTarget();
+                            target.Layout = @"${date:format=HH\:mm}  ${message}";
+
+                            //codigo agregado
+                            FileTarget filetarjet = new FileTarget();
+                            DateTime Fecha = DateTime.Now;
+                            string nameFile = "";
+                            nameFile = Path.GetFileNameWithoutExtension(fullpath);
+                            if (!Directory.Exists(Logpath + @"\Log"))
+                                Directory.CreateDirectory(Logpath + @"\Log");
+
+                            filetarjet.FileName = Logpath + @"\Log\" + "[" + nameFile + "].txt";
+                            filetarjet.Layout = @"${date:format=HH\:mm}  ${message}";
+                            //fin codigo agregado
+
+                            config.AddTarget("Console", target);
+                            config.AddTarget("file", filetarjet);
+                            config.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, target));
+                            config.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, filetarjet));
+
+                            NLog.LogManager.Configuration = config;
+                            #endregion Bitacora
+
                             var client = new DicomClient();
                             client.NegotiateAsyncOps();
                             client.AddRequest(new DicomCEchoRequest());
                             client.AddRequest(new DicomCStoreRequest(fullpath));
-                            Log.EscribeLog("IP Servidor destino: " + _ser);
-                            Log.EscribeLog("Puerto Servidor destino: " + port.ToString());
-                            Log.EscribeLog("AETitle Local: " + _aetS);
-                            Log.EscribeLog("AETitle Server: " + _aetA);
+                            //Log.EscribeLog("IP Servidor destino: " + _ser);
+                            //Log.EscribeLog("Puerto Servidor destino: " + port.ToString());
+                            //Log.EscribeLog("AETitle Local: " + _aetS);
+                            //Log.EscribeLog("AETitle Server: " + _aetA);
                             client.Send(_ser, port, false, _aetS, _aetA);
+                            foreach (DicomPresentationContext ctr in client.AdditionalPresentationContexts)
+                            {
+                                Log.EscribeLog("PresentationContext: " + ctr.AbstractSyntax + " Result: " + ctr.Result);
+                            }
+                            client.
+
                             respuesta = "1";
 
                             Log.EscribeLog("Enviado: " + fullpath);
