@@ -1,14 +1,10 @@
-﻿using NLog.Config;
-using NLog.Targets;
-
-using Dicom;
-using Dicom.Imaging;
+﻿using Dicom;
 using Dicom.Log;
 using Dicom.Network;
 using FUJI.SenderFeed2SCU.Service.DataBase;
-using FUJI.SenderFeed2SCU.Service.Entidades;
 using FUJI.SenderFeed2SCU.Service.Extensions;
-using FUJI.SenderFeed2SCU.Service.Feed2Service;
+using NLog.Config;
+using NLog.Targets;
 using System;
 using System.Configuration;
 using System.IO;
@@ -217,8 +213,6 @@ namespace FUJI.SenderFeed2SCU.Service
                             {
                                 Log.EscribeLog("PresentationContext: " + ctr.AbstractSyntax + " Result: " + ctr.Result);
                             }
-                            client.
-
                             respuesta = "1";
 
                             Log.EscribeLog("Enviado: " + fullpath);
