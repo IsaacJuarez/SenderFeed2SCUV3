@@ -26,6 +26,8 @@ namespace FUJI.SenderFeed2SCU.Service
         public static string AETitle = "";
         public static string vchPathRep = "";
         public static string path = "";
+        public static string pathEscucha = "";
+        public static string pathFinal = "";
         public static string Logpath = "";
 
         public SenderFeed2SCUService()
@@ -36,7 +38,40 @@ namespace FUJI.SenderFeed2SCU.Service
 
         private void cargarServicio()
         {
-            throw new NotImplementedException();
+            try
+            {
+                fileSystemWatcher1.Created += EscucharCarpeta;
+                fileSystemWatcher1.Changed += EscucharCarpeta;
+            }
+            catch (Exception ecS)
+            {
+                Log.EscribeLog("Existe un error al cargar el servicio para escuchar la carpeta: " + ecS.Message);
+            }
+        }
+
+        private void EscucharCarpeta(object sender, FileSystemEventArgs e)
+        {
+            try
+            {
+                try
+                {
+                    pathEscucha = ConfigurationManager.AppSettings["PathDes"] != null ? ConfigurationManager.AppSettings["PathDes"].ToString() : "";
+                }
+                catch (Exception ePath)
+                {
+                    pathEscucha = "";
+                    Log.EscribeLog("Error al obtener el path desde appSettings: " + ePath.Message);
+                }
+
+                if (pathEscucha != "")
+                {
+
+                }
+            }
+            catch (Exception eeC)
+            {
+                Log.EscribeLog("Existe un error en EscucharCarpeta: " + eeC.Message);
+            }
         }
 
         private void cargarTimmer()
@@ -90,12 +125,12 @@ namespace FUJI.SenderFeed2SCU.Service
                 {
                     NapoleonSenderDataAccess.setService(id_Servicio, vchClaveSitio);
                 }
-                catch(Exception setSer)
+                catch (Exception setSer)
                 {
-                    Log.EscribeLog("Existe un error en setService: "+ setSer.Message);
+                    Log.EscribeLog("Existe un error en setService: " + setSer.Message);
                 }
             }
-            catch(Exception eCS)
+            catch (Exception eCS)
             {
                 Log.EscribeLog("Existe un error en cargarServicio: " + eCS.Message);
             }
@@ -144,7 +179,7 @@ namespace FUJI.SenderFeed2SCU.Service
                     }
                 }
             }
-            catch(Exception eSyn)
+            catch (Exception eSyn)
             {
                 Log.EscribeLog("Existe un error en SenderTimer_Elapsed: " + eSyn.Message);
             }
@@ -159,7 +194,7 @@ namespace FUJI.SenderFeed2SCU.Service
                 {
                     try
                     {
-                        
+
                         string _ser = _conf.vchIPServidor;
                         int port = _conf.intPuertoServer;
                         string _aetS = _conf.vchAETitle;
@@ -230,7 +265,7 @@ namespace FUJI.SenderFeed2SCU.Service
                         {
                             NapoleonSenderDataAccess.setService(id_Servicio, vchClaveSitio);
                         }
-                        catch(Exception es)
+                        catch (Exception es)
                         {
                             Log.EscribeLog("Existe un error en enviar el estatus del servicio: " + es.Message);
                         }
@@ -247,7 +282,7 @@ namespace FUJI.SenderFeed2SCU.Service
                         NapServer.updateEstatus(intDetEstudioID, id_Servicio, vchClaveSitio);
                         //moverFile(fullpath, respuesta);
                     }
-                    
+
                 }
                 catch (Exception esf)
                 {
@@ -291,6 +326,24 @@ namespace FUJI.SenderFeed2SCU.Service
 
         protected override void OnStart(string[] args)
         {
+            try
+            {
+                pathEscucha = ConfigurationManager.AppSettings["PathDes"] != null ? ConfigurationManager.AppSettings["PathDes"].ToString() : "";
+            }
+            catch (Exception ePath)
+            {
+                path = "";
+                Log.EscribeLog("Error al obtener el path desde appSettings: " + ePath.Message);
+            }
+            if (pathEscucha != "")
+            {
+                if (!Directory.Exists(pathEscucha))
+                {
+                    Directory.CreateDirectory(pathEscucha);
+                }
+                fileSystemWatcher1.Path = path;
+            }
+
             // TODO: agregar código aquí para iniciar el servicio.
         }
 

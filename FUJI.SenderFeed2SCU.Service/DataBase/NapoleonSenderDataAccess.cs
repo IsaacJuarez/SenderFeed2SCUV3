@@ -63,7 +63,7 @@ namespace FUJI.SenderFeed2SCU.Service.DataBase
                 //request.id_SitioSpecified = true;
                 request.vchClaveSitio = vchClaveSitio;
                 request.Token = Security.Encrypt(id_Servicio + "|" + vchClaveSitio);
-                request.tipoServicio = 3;
+                request.tipoServicio = 4;
                 //request.tipoServicioSpecified = true;
                 NapoleonDA.setService(request);
             }
